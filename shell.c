@@ -21,7 +21,8 @@ void expand_var(char *input) {
             char *var_start = input_pointer;
             while ((*input_pointer >= 'A' && *input_pointer <= 'Z') ||
                    (*input_pointer >= 'a' && *input_pointer <= 'z') ||
-                   (*input_pointer >= '0' && *input_pointer <= '9') || *input_pointer == '_') {
+                   (*input_pointer >= '0' && *input_pointer <= '9') ||
+                   *input_pointer == '_') {
                 input_pointer++;
             }
             strncpy(var_name, var_start, input_pointer - var_start);
@@ -39,7 +40,8 @@ void expand_var(char *input) {
 }
 
 int handle_builtin_commands(char **args) {
-    if (args[0] == NULL) {return 0;}
+    if (args[0] == NULL)
+        return 0;
 
     if (strcmp(args[0], "exit") == 0 || strcmp(args[0], "quit") == 0) {
         printf("Exiting shell...\n");
@@ -48,26 +50,23 @@ int handle_builtin_commands(char **args) {
 
     if (strcmp(args[0], "pwd") == 0) {
         char current_dir[MAX_INPUT];
-        if (getcwd(current_dir, sizeof(current_dir)) != NULL) {
+        if (getcwd(current_dir, sizeof(current_dir)) != NULL)
             printf("%s\n", current_dir);
-        } else {
+        else
             perror("pwd");
-        }
         return 1;
     }
 
     if (strcmp(args[0], "cd") == 0) {
-        if (args[1] == NULL || chdir(args[1]) != 0) {
+        if (args[1] == NULL || chdir(args[1]) != 0)
             perror("cd");
-        }
         return 1;
     }
 
     if (strcmp(args[0], "set") == 0) {
         if (args[1] && args[2]) {
-            if (setenv(args[1], args[2], 1) != 0) {
+            if (setenv(args[1], args[2], 1) != 0)
                 perror("set");
-            }
         } else {
             fprintf(stderr, "Usage: set <var name> <var value>\n");
         }
@@ -76,9 +75,8 @@ int handle_builtin_commands(char **args) {
 
     if (strcmp(args[0], "unset") == 0) {
         if (args[1]) {
-            if (unsetenv(args[1]) != 0) {
+            if (unsetenv(args[1]) != 0)
                 perror("unset");
-            }
         } else {
             fprintf(stderr, "Usage: unset <var name>\n");
         }
@@ -115,11 +113,10 @@ void execute_command(char **args, int input_fd, int output_fd, int background) {
         fprintf(stderr, "%s: command not found\n", args[0]);
         exit(1);
     } else {
-        if (!background) {
+        if (!background)
             waitpid(pid, NULL, 0);
-        } else {
+        else
             printf("Process %d running in background\n", pid);
-        }
     }
 }
 
@@ -153,7 +150,8 @@ void handle_pipes_and_redirection(char *input) {
         if (output_redir) {
             *output_redir = '\0';
             output_redir = strtok(output_redir + 1, " \t\n");
-            output_fd = open(output_redir, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
+            output_fd = open(output_redir, O_WRONLY | O_CREAT | O_TRUNC,
+                             S_IRUSR | S_IWUSR);
             if (output_fd < 0) {
                 perror("Output redirection Failed");
                 return;
@@ -173,13 +171,15 @@ void handle_pipes_and_redirection(char *input) {
         }
 
         parse_input(commands[ix], args);
-        if (!handle_builtin_commands(args)) {
+        if (!handle_builtin_commands(args))
             execute_command(args, input_fd, output_fd, background);
-        }
 
-        if (output_fd != STDOUT_FILENO) {close(output_fd);}
-        if (input_fd != STDIN_FILENO) {close(input_fd);}
+        if (output_fd != STDOUT_FILENO)
+            close(output_fd);
+        if (input_fd != STDIN_FILENO)
+            close(input_fd);
 
-        if (ix < commands_num - 1) {input_fd = pipe_fd[0];}
+        if (ix < commands_num - 1)
+            input_fd = pipe_fd[0];
     }
 }
