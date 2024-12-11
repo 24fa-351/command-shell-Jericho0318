@@ -1,13 +1,13 @@
 #ifndef SHELL_H
 #define SHELL_H
 
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/wait.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 #include "shell.h"
 
@@ -23,6 +23,5 @@ int handle_builtin_commands(char **args);
 void execute_command(char **args, int input_fd, int output_fd, int background);
 
 void handle_pipes_and_redirection(char *input);
-
 
 #endif
